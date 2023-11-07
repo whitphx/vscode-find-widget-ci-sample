@@ -8,8 +8,24 @@ import * as vscode from 'vscode';
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
 
-	test('Sample test', () => {
-		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+	test('Find widget test', async () => {
+		const initialText = "aaa\nbbb\nccc\n";
+		const doc = await vscode.workspace.openTextDocument({
+			content: initialText,
+		});
+
+		await vscode.window.showTextDocument(doc);
+
+		const activeTextEditor = vscode.window.activeTextEditor;
+		assert.ok(activeTextEditor);
+
+		activeTextEditor.selection = new vscode.Selection(0, 0, 0, 0);
+
+		await vscode.commands.executeCommand("editor.actions.findWithArgs", {
+			searchString: "bbb",
+		});
+		await vscode.commands.executeCommand<void>("editor.action.nextMatchFindAction")
+
+		assert.ok(activeTextEditor.selection.isEqual(new vscode.Selection(1, 0, 1, 3)));
 	});
 });
